@@ -1,22 +1,20 @@
 #define RGBWait 200
-
 #define LDRWait 10 
-
 #define LDR 0
 #define PrintGray
 #define PrintBlack
 #define PrintWhite
+MeLineFollower lineFinder(PORT_2);
 
 int red = 0;
 int green = 0;
 int blue = 0;
-
+String colours[] = {"Red","Green","Blue","Orange","Pink"};
 float colourArray[] = { 0, 0, 0 };
 float whiteArray[] = { 0, 0, 0 };
 float blackArray[] = { 0, 0, 0 };
 float greyDiff[] = { 0, 0, 0 };
 
-char colourStr[3][5] = { "R = ", "G = ", "B = " };
 void input(int code) {
   if (code == 0) {
     //TURN RED
@@ -45,24 +43,25 @@ bool over_half(float color_val){
     return false;
   }
 }
-void PrintColor(int Red, int Green, int Blue){
+char* classifyColour(int Red, int Green, int Blue){
   if(!over_half(Green) && !over_half(Blue)){
-    Serial.print("Red ");
+    return "Red";
   }
   else if(!over_half(Red) && !over_half(Green)){
-    Serial.print("Blue ");
+    return "Blue";
   }
   else if(!over_half(Blue) && !over_half(Red)){
-    Serial.print("Green");
+    return "Green";
   }
   else if(Red>Blue && Green>Blue){
-    Serial.print("Orange");
+    return "Orange";
   }
   else{
-    Serial.print("Pink ");
+    return "Pink";
   }
 }
-void color_sensing() {
+
+char* color_sensing() {
   countdown_time(5);
   for (int c = 0; c <= 2; c++) {
     input(c);
@@ -75,9 +74,13 @@ void color_sensing() {
     Serial.print(",");
     delay(LDRWait);
   }
-  PrintColor(colourArray[0],colourArray[1],colourArray[2]);
+  char *colour = classifyColour(colourArray[0],colourArray[1],colourArray[2]);
+  char *res = colour;
+  Serial.print(res);
   Serial.println("");
+  return res;
 }
+
 void countdown_time(int time){
   for(int i=0;i<=time;++i){
     delay(500);
@@ -136,4 +139,27 @@ int getAvgReading(int times) {
   }
 
   return total / times;
+}
+
+void detect_black(){
+  int sensorState = lineFinder.readSensors();
+  if(sensorState == S1_IN_S2_IN){
+    stop();
+    char* res = color_sensing();
+    if(strcmp(res,"Red") == 0){
+      turn_left();
+    }
+    else if(strcmp(res,"Green") == 0){
+      turn_right();
+    }
+    else if(strcmp(res,"Blue") == 0){
+      successive_right();
+    }
+    else if(strcmp(res,"Orange")){
+      turn_U();
+    }
+    else{
+      successive_left();
+    }
+  }
 }

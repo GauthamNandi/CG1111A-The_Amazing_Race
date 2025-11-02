@@ -1,8 +1,10 @@
+#include <MeMCore.h>
 const int S1 = A2;
 const int S2 = A3;
 #define LED 13
-#define Debug_Ultrasonic
-
+// #define Debug_Ultrasonic
+#define Debug_Locomotion
+// #define Debug_Color
 void initialize(); //PID algorithm
 
 void setup() {
@@ -19,8 +21,11 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  adjust_locomotion();
-  #ifdef Debug_Ultrasonic
-  debug_ulsensor_distance();
+  #ifdef Debug_Locomotion
+  go_forward();
+  detect_black();
+  #endif
+  #ifdef Debug_Color
+  color_sensing();
   #endif
 }

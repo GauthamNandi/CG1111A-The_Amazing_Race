@@ -1,15 +1,14 @@
 #include "MeMCore.h"
 
-MeDCMotor leftMotor(M1);
-MeDCMotor rightMotor(M2);
-uint8_t motorSpeed = 200;
-
 #define TIMEOUT 2000
 #define SPEED_OF_SOUND 340
 #define ULTRASONIC 12
 
-long dist();
+MeDCMotor leftMotor(M1);
+MeDCMotor rightMotor(M2);
+uint8_t motorSpeed = 200;
 
+long dist();
 void forward(int pid) {
   // ✅ Fixed: Inverted correction so robot turns AWAY from wall
   if (pid < 0) {
@@ -60,8 +59,43 @@ int calcpid() {
   // return 0;
   return pid;
 }
-void adjust_locomotion(){
+
+void go_forward(){
   double pid = calcpid();
   forward(pid);
   delayMicroseconds(50);
+}
+
+void turn_left(){
+  leftMotor.run(motorSpeed);
+  rightMotor.run(motorSpeed);
+  delay(1000);
+}
+
+void turn_right(){
+  leftMotor.run(-motorSpeed);
+  rightMotor.run(-motorSpeed);
+  delay(1000);
+}
+void turn_U(){
+  leftMotor.run(motorSpeed);
+  rightMotor.run(motorSpeed);
+}
+void successive_left(){
+  turn_left();
+  for(int i=0;i<10;++i){
+    go_forward();
+  }
+  turn_left();
+}
+void successive_right(){
+  turn_right();
+  for(int i=0;i<10;++i){
+    go_forward();
+  }
+  turn_right();
+}
+void stop(){
+  leftMotor.run(0);
+  rightMotor.run(0);
 }
