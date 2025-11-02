@@ -8,13 +8,7 @@ uint8_t motorSpeed = 200;
 #define SPEED_OF_SOUND 340
 #define ULTRASONIC 12
 
-void initialize();
 long dist();
-
-void setup() {
-  Serial.begin(9600);
-  initialize();
-}
 
 void forward(int pid) {
   // ✅ Fixed: Inverted correction so robot turns AWAY from wall
@@ -66,8 +60,7 @@ int calcpid() {
   // return 0;
   return pid;
 }
-
-void loop() {
+void adjust_locomotion(){
   double pid = calcpid();
   forward(pid);
   delayMicroseconds(50);
