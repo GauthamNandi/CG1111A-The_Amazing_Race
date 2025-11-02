@@ -70,14 +70,18 @@ char* color_sensing() {
     colourArray[c] = (colourArray[c] - blackArray[c]) / (greyDiff[c]) * 255.0;
     input(3); 
     delay(RGBWait);
-    Serial.print(int(colourArray[c]));
-    Serial.print(",");
+    #ifdef Debug_Color
+      Serial.print(int(colourArray[c]));
+      Serial.print(",");
+    #endif
     delay(LDRWait);
   }
   char *colour = classifyColour(colourArray[0],colourArray[1],colourArray[2]);
   char *res = colour;
-  Serial.print(res);
-  Serial.println("");
+  #ifdef Debug_Color
+    Serial.print(res);
+    Serial.println("");
+  #endif
   return res;
 }
 
@@ -121,10 +125,9 @@ void setBalance() {
     delay(RGBWait);
     greyDiff[i] = whiteArray[i] - blackArray[i];
   }
-  
-    Serial.println("Black Array:");
-    print_array(blackArray);
-    Serial.println("Put colored sheet");
+  Serial.println("Black Array:");
+  print_array(blackArray);
+  Serial.println("Put colored sheet");
 }
 
 

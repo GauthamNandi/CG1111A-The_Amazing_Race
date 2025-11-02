@@ -4,10 +4,6 @@
 #define SPEED_OF_SOUND 340
 #define ULTRASONIC 12
 
-MeDCMotor leftMotor(M1);
-MeDCMotor rightMotor(M2);
-uint8_t motorSpeed = 200;
-
 long dist();
 void forward(int pid) {
   // ✅ Fixed: Inverted correction so robot turns AWAY from wall
@@ -80,6 +76,7 @@ void turn_right(){
 void turn_U(){
   leftMotor.run(motorSpeed);
   rightMotor.run(motorSpeed);
+  delay(1000);
 }
 void successive_left(){
   turn_left();
