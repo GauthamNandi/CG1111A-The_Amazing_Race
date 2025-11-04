@@ -65,18 +65,19 @@ void go_forward(){
 void turn_left(){
   leftMotor.run(motorSpeed);
   rightMotor.run(motorSpeed);
-  delay(1000);
+  delay(400);
+  stop();
 }
 
 void turn_right(){
   leftMotor.run(-motorSpeed);
   rightMotor.run(-motorSpeed);
-  delay(1000);
+  delay(400);
 }
 void turn_U(){
   leftMotor.run(motorSpeed);
   rightMotor.run(motorSpeed);
-  delay(1000);
+  delay(800);
 }
 void successive_left(){
   turn_left();
@@ -87,9 +88,8 @@ void successive_left(){
 }
 void successive_right(){
   turn_right();
-  for(int i=0;i<10;++i){
-    go_forward();
-  }
+  go_forward();
+  delay(330);
   turn_right();
 }
 void stop(){
