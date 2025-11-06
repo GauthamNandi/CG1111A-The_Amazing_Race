@@ -9,7 +9,7 @@ MeLineFollower lineFinder(PORT_2);
 int red = 0;
 int green = 0;
 int blue = 0;
-String colours[] = {"Red","Green","Blue","Orange","Pink"};
+char* colours[] = {"Red","Green","Blue","Orange","Pink"};
 float colourArray[] = { 0, 0, 0 };
 float whiteArray[] = { 0, 0, 0 };
 float blackArray[] = { 0, 0, 0 };
@@ -144,25 +144,30 @@ int getAvgReading(int times) {
   return total / times;
 }
 
-void detect_black(){
+bool detect_black() {
   int sensorState = lineFinder.readSensors();
-  if(sensorState == S1_IN_S2_IN){
-    stop();
-    char* res = color_sensing();
-    if(strcmp(res,"Red") == 0){
-      turn_left();
-    }
-    else if(strcmp(res,"Green") == 0){
-      turn_right();
-    }
-    else if(strcmp(res,"Blue") == 0){
-      successive_right();
-    }
-    else if(strcmp(res,"Orange")){
-      turn_U();
-    }
-    else{
-      successive_left();
-    }
-  }
+  return (sensorState == S1_IN_S2_IN);
 }
+
+// void detect_black(){
+//   int sensorState = lineFinder.readSensors();
+//   if(sensorState == S1_IN_S2_IN){
+//     stop();
+//     char* res = color_sensing();
+//     if(strcmp(res,"Red") == 0){
+//       turnLeft();
+//     }
+//     else if(strcmp(res,"Green") == 0){
+//       turnRight();
+//     }
+//     else if(strcmp(res,"Blue") == 0){
+//       doubleRightTurn();
+//     }
+//     else if(strcmp(res,"Orange")){
+//       uTurn();
+//     }
+//     else{
+//       doubleLeftTurn();
+//     }
+//   }
+// }
