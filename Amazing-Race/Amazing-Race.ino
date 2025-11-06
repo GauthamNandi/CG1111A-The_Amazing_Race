@@ -5,7 +5,6 @@
 // #define Debug_Color
 const int S1 = A2;
 const int S2 = A3;
-#define LED 13
 
 void setup() {
     Serial.begin(9600);
@@ -13,9 +12,7 @@ void setup() {
 
     pinMode(S1, OUTPUT);
     pinMode(S2, OUTPUT);
-    pinMode(LED, OUTPUT);  
     setBalance(); 
-    digitalWrite(LED, HIGH);
 }
 
 bool FORWARD = true;
