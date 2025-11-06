@@ -1,15 +1,18 @@
-#define RGBWait 200
-#define LDRWait 10 
+#define RGBWait 400
+#define LDRWait 10
 #define LDR 0
 #define PrintGray
 #define PrintBlack
 #define PrintWhite
 MeLineFollower lineFinder(PORT_2);
+<<<<<<< HEAD
 int red = 0;
 int green = 0;
 int blue = 0;
 int sentivity = 10;
 char* colours[] = {"Red","Green","Blue","Orange","Pink"};
+=======
+>>>>>>> c35bbcb6c325b2b1ed4e147968dbcd92a9c167c9
 float colourArray[] = { 0, 0, 0 };
 float whiteArray[] = { 0, 0, 0 };
 float blackArray[] = { 0, 0, 0 };
@@ -35,14 +38,10 @@ void input(int code) {
     digitalWrite(S2, HIGH);
   }
 }
-bool over_half(float color_val){
-  if(color_val>float(255)/2){
-    return true;
-  }
-  else{
-    return false;
-  }
+bool over_half(float color_val) {
+  return (color_val > float(255) / 2);
 }
+<<<<<<< HEAD
 char* classifyColour(int Red, int Green, int Blue){
   if(!over_half(Green-sentivity) && !over_half(Blue-sentivity)){
     return "Red";
@@ -65,41 +64,45 @@ char* classifyColour(int Red, int Green, int Blue){
 }
 
 char* color_sensing() {
+=======
+
+String color_sensing() {
+  countdown_time(5);
+>>>>>>> c35bbcb6c325b2b1ed4e147968dbcd92a9c167c9
   for (int c = 0; c <= 2; c++) {
     input(c);
     delay(RGBWait);
     colourArray[c] = getAvgReading(5);
     colourArray[c] = (colourArray[c] - blackArray[c]) / (greyDiff[c]) * 255.0;
-    input(3); 
+    input(3);
     delay(RGBWait);
-    #ifdef Debug_Color
-      Serial.print(int(colourArray[c]));
-      Serial.print(",");
-    #endif
+#ifdef Debug_Color
+    Serial.print(int(colourArray[c]));
+    Serial.print(",");
+#endif
     delay(LDRWait);
   }
-  char *colour = classifyColour(colourArray[0],colourArray[1],colourArray[2]);
-  char *res = colour;
-  #ifdef Debug_Color
-    Serial.print(res);
-    Serial.println("");
-  #endif
+  String colour = classifyColour();
+  String res = colour;
+#ifdef Debug_Color
+  Serial.println(res);
+#endif
   return res;
 }
 
-void countdown_time(int time){
-  for(int i=0;i<=time;++i){
-    delay(500);
-    Serial.print(i);
-    Serial.print(" ");
+void countdown_time(int time) {
+  for (int i = time; i >= 1; i--) {
+    Serial.print(i + " ");
+    delay(1000);
   }
   Serial.println();
 }
-void print_array(float a[]){
-  for(int i=0;i<3;++i){
+
+void print_array(float a[]) {
+  for (int i = 0; i < 3; ++i) {
     Serial.print(a[i]);
     Serial.print(" ");
-  } 
+ }
   Serial.println();
   delay(500);
 }
@@ -130,8 +133,6 @@ void setBalance() {
   print_array(blackArray);
   Serial.println("Put colored sheet");
 }
-
-
 int getAvgReading(int times) {
   int reading;
   int total = 0;
