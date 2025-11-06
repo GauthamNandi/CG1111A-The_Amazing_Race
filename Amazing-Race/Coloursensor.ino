@@ -5,14 +5,11 @@
 #define PrintBlack
 #define PrintWhite
 MeLineFollower lineFinder(PORT_2);
-<<<<<<< HEAD
 int red = 0;
 int green = 0;
 int blue = 0;
 int sentivity = 10;
 char* colours[] = {"Red","Green","Blue","Orange","Pink"};
-=======
->>>>>>> c35bbcb6c325b2b1ed4e147968dbcd92a9c167c9
 float colourArray[] = { 0, 0, 0 };
 float whiteArray[] = { 0, 0, 0 };
 float blackArray[] = { 0, 0, 0 };
@@ -41,7 +38,6 @@ void input(int code) {
 bool over_half(float color_val) {
   return (color_val > float(255) / 2);
 }
-<<<<<<< HEAD
 char* classifyColour(int Red, int Green, int Blue){
   if(!over_half(Green-sentivity) && !over_half(Blue-sentivity)){
     return "Red";
@@ -63,31 +59,23 @@ char* classifyColour(int Red, int Green, int Blue){
   }
 }
 
-char* color_sensing() {
-=======
 
-String color_sensing() {
+char* color_sensing() {
   countdown_time(5);
->>>>>>> c35bbcb6c325b2b1ed4e147968dbcd92a9c167c9
   for (int c = 0; c <= 2; c++) {
     input(c);
     delay(RGBWait);
     colourArray[c] = getAvgReading(5);
     colourArray[c] = (colourArray[c] - blackArray[c]) / (greyDiff[c]) * 255.0;
-    input(3);
+    input(3); 
     delay(RGBWait);
-#ifdef Debug_Color
     Serial.print(int(colourArray[c]));
     Serial.print(",");
-#endif
     delay(LDRWait);
   }
-  String colour = classifyColour();
-  String res = colour;
-#ifdef Debug_Color
-  Serial.println(res);
-#endif
-  return res;
+  char *colour = classifyColour(colourArray[0],colourArray[1],colourArray[2]);
+  Serial.print(colour);
+  Serial.println("");
 }
 
 void countdown_time(int time) {

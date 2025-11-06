@@ -37,7 +37,10 @@ void loop() {
     } 
     else {
         String s = String(g_color);
-<<<<<<< HEAD
+        turnLedOn(s);
+        delay(1000);
+        led.setColor(0,0,0);
+        led.show();
         if (s == "Red") turnLeft();
         else if (s == "Green") turnRight();
         else if (s == "Orange") uTurn();
@@ -45,12 +48,6 @@ void loop() {
         else if (s == "Blue") doubleRightTurn();
         moveForward();
         delay(100);
-        turnLedOn(s);
-        delay(1000);
-        led.setColor(0,0,0);
-        led.show();
-=======
->>>>>>> c35bbcb6c325b2b1ed4e147968dbcd92a9c167c9
         FORWARD = true;
     }
     delay(10);
