@@ -1,12 +1,12 @@
-#include <MeMCore.h>
-// #define Debug_Color
+#include "MeOrion.h"
+#define Debug_Color
 // #define Debug_Movement
 const int S1 = A2;
 const int S2 = A3;
 bool FORWARD = true;
 float speedPID;
 String g_color = "";
-
+MeRGBLed led(PORT_3);
 void setup() {
     initialize_PID();
     Serial.begin(9600);
@@ -15,18 +15,17 @@ void setup() {
     pinMode(S2, OUTPUT);
     setBalance();
     #endif 
-    // turnLeft();
-    // turnRight();
-    // uTurn();
-    doubleLeftTurn();
-    // doubleRightTurn();
+    Serial.println("ngu2");
 }
 
 void loop() {
-    // moveForward();
+    #ifdef Debug_Color
+    color_sensing();
+    #endif
+        // moveForward();
+
     #ifdef Debug_Movement
     if (FORWARD) {
-        Serial.println("ngu1");
         speedPID = calculate_PID();
         moveForward();
         
@@ -37,13 +36,19 @@ void loop() {
         } 
     } 
     else {
-        Serial.println("ngu2");
         String s = String(g_color);
+        turnLedOn(s);
+        delay(1000);
+        led.setColor(0,0,0);
+        led.show();
         if (s == "Red") turnLeft();
         else if (s == "Green") turnRight();
         else if (s == "Orange") uTurn();
         else if (s == "Pink") doubleLeftTurn();
         else if (s == "Blue") doubleRightTurn();
+        else if (s=="White")
+        moveForward();
+        delay(100);
         FORWARD = true;
     }
     delay(10);

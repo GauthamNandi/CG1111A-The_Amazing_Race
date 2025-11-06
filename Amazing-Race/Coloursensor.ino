@@ -5,10 +5,10 @@
 #define PrintBlack
 #define PrintWhite
 MeLineFollower lineFinder(PORT_2);
-
 int red = 0;
 int green = 0;
 int blue = 0;
+int sentivity = 10;
 char* colours[] = {"Red","Green","Blue","Orange","Pink"};
 float colourArray[] = { 0, 0, 0 };
 float whiteArray[] = { 0, 0, 0 };
@@ -44,17 +44,20 @@ bool over_half(float color_val){
   }
 }
 char* classifyColour(int Red, int Green, int Blue){
-  if(!over_half(Green) && !over_half(Blue)){
+  if(!over_half(Green-sentivity) && !over_half(Blue-sentivity)){
     return "Red";
   }
-  else if(!over_half(Red) && !over_half(Green)){
+  else if(!over_half(Red-sentivity) && !over_half(Green-sentivity)){
     return "Blue";
   }
-  else if(!over_half(Blue) && !over_half(Red)){
+  else if(!over_half(Blue-sentivity) && !over_half(Red-sentivity)){
     return "Green";
   }
-  else if(Red>Blue && Green>Blue){
+  else if(Red+sentivity>Blue && Green+sentivity>Blue){
     return "Orange";
+  }
+  else if(Red>=255-3*sentivity && Green>=255-3*sentivity){
+    return "White";
   }
   else{
     return "Pink";
@@ -62,7 +65,6 @@ char* classifyColour(int Red, int Green, int Blue){
 }
 
 char* color_sensing() {
-  countdown_time(5);
   for (int c = 0; c <= 2; c++) {
     input(c);
     delay(RGBWait);
@@ -142,7 +144,15 @@ int getAvgReading(int times) {
 
   return total / times;
 }
-
+void turnLedOn(String s){
+  if (s == "Red") led.setColor(255,0,0);
+  else if (s == "Green") led.setColor(0,255,0);
+  else if (s == "Orange") led.setColor(255,255,0);
+  else if (s == "Pink") led.setColor(0,255,255);
+  else if (s == "Blue") led.setColor(0,0,255);
+  else led.setColor(255,255,255);
+  led.show();
+}
 bool detect_black() {
   int sensorState = lineFinder.readSensors();
   return (sensorState == S1_IN_S2_IN);
