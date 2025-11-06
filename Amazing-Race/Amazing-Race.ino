@@ -1,37 +1,46 @@
 #include <MeMCore.h>
+
+// #define Debug_Ultrasonic
+// #define Debug_Locomotion
+// #define Debug_Color
 const int S1 = A2;
 const int S2 = A3;
 #define LED 13
 
-MeDCMotor leftMotor(M1);
-MeDCMotor rightMotor(M2);
-uint8_t motorSpeed = 200;
-// #define Debug_Ultrasonic
-// #define Debug_Locomotion
-// #define Debug_Color
 void setup() {
-  pinMode(S1, OUTPUT);
-  pinMode(S2, OUTPUT);
-  pinMode(LED, OUTPUT);  
-  Serial.begin(9600);
-  setBalance();  //calibration
-  digitalWrite(LED, HIGH);
+    Serial.begin(9600);
+    initialize_PID();
 
-  initialize();
-  Serial.begin(9600);
+    pinMode(S1, OUTPUT);
+    pinMode(S2, OUTPUT);
+    pinMode(LED, OUTPUT);  
+    setBalance(); 
+    digitalWrite(LED, HIGH);
 }
 
+bool FORWARD = true;
+float speedPID;
+String g_color = "";
+
 void loop() {
-  // put your main code here, to run repeatedly:
-  delay(1000);
-  turn_left();
-  turn_right();
-  turn_U();
-  #ifdef Debug_Locomotion
-  go_forward();
-  detect_black();
-  #endif
-  #ifdef Debug_Color
-  color_sensing();
-  #endif
+    if (FORWARD) {
+        speedPID = calculate_PID();
+        moveForward();
+        
+        if (detect_black()) {
+            stopMotor();
+            g_color = (String)color_sensing();
+            FORWARD = false;
+        } 
+    } 
+    else {
+        String s = String(g_color);
+        if (s == "RED") turnLeft();
+        else if (s == "GREEN") turnRight();
+        else if (s == "ORANGE") uTurn();
+        else if (s == "Pink") doubleLeftTurn();
+        else if (s == "LIGHTBLUE") doubleRightTurn();
+        FORWARD = true;
+    }
+    delay(10);
 }
