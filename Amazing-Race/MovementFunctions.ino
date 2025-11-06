@@ -11,9 +11,9 @@ MeDCMotor leftMotor(M1);
 MeDCMotor rightMotor(M2);
 
 void initialize_PID() {
-    kp = 4.0;
+    kp = 20.0;
     ki = 0.0;
-    kd = 2; 
+    kd = 0.0; 
     lsttime = millis();
 }
 
@@ -22,7 +22,7 @@ double calculate_PID() {
     double dt = (now - lsttime) / 1000.0;
     if (dt <= 0) dt = 0.001;
 
-    long setpoint = 11;
+    long setpoint = 10;
     double distance = find_distance();
     double error = setpoint - distance;
 
@@ -37,7 +37,7 @@ double calculate_PID() {
     lsttime = now;
 
     // return 0;
-    return pid;
+    return -pid;
 }
 
 void stopMotor() {// Code for stopping motor}
@@ -46,13 +46,8 @@ void stopMotor() {// Code for stopping motor}
 }
 
 void moveForward() {// Code for moving forward for some short interval}
-    if (speedPID < 0) {
-        leftMotor.run(MOTOR_SPEED - speedPID);
-        rightMotor.run(-MOTOR_SPEED - speedPID);
-    } else {
-        leftMotor.run(MOTOR_SPEED + speedPID);
-        rightMotor.run(-MOTOR_SPEED + speedPID);
-    }
+    leftMotor.run(MOTOR_SPEED + speedPID);
+    rightMotor.run(-MOTOR_SPEED + speedPID);
 }
 
 void helper_turnRight() {// Code for turning right 90 deg}
