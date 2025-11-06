@@ -105,7 +105,6 @@ void setBalance() {
   //set white balance
   Serial.println("Put White Sample For Calibration ...");
   countdown_time(5);
-  digitalWrite(LED, LOW);
   for (int i = 0; i <= 2; i++) {
     input(i);
     delay(RGBWait);
@@ -149,25 +148,3 @@ bool detect_black() {
   return (sensorState == S1_IN_S2_IN);
 }
 
-// void detect_black(){
-//   int sensorState = lineFinder.readSensors();
-//   if(sensorState == S1_IN_S2_IN){
-//     stop();
-//     char* res = color_sensing();
-//     if(strcmp(res,"Red") == 0){
-//       turnLeft();
-//     }
-//     else if(strcmp(res,"Green") == 0){
-//       turnRight();
-//     }
-//     else if(strcmp(res,"Blue") == 0){
-//       doubleRightTurn();
-//     }
-//     else if(strcmp(res,"Orange")){
-//       uTurn();
-//     }
-//     else{
-//       doubleLeftTurn();
-//     }
-//   }
-// }
