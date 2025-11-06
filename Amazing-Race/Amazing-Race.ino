@@ -35,8 +35,8 @@ void loop() {
         if (s == "RED") turnLeft();
         else if (s == "GREEN") turnRight();
         else if (s == "ORANGE") uTurn();
-        else if (s == "Pink") doubleLeftTurn();
-        else if (s == "LIGHTBLUE") doubleRightTurn();
+        else if (s == "PINK") doubleLeftTurn();
+        else if (s == "BLUE") doubleRightTurn();
         FORWARD = true;
     }
     delay(10);
