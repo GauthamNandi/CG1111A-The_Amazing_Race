@@ -6,6 +6,7 @@ const int S2 = A3;
 bool FORWARD = true;
 float speedPID;
 String g_color = "";
+// MeBuzzer buzzer;
 MeRGBLed led(PORT_3);
 void setup() {
     initialize_PID();
