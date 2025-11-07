@@ -1,5 +1,5 @@
 #define TURN_TIME 625
-#define TURNING_SPEED 150
+#define TURNING_SPEED 180
 #define MOTOR_SPEED 200
 #define STRAIGHT_TIME 1000
 
@@ -37,7 +37,7 @@ double calculate_PID() {
     lsttime = now;
 
     // return 0;
-    return -pid;
+    return pid;
 }
 
 void stopMotor() {// Code for stopping motor}
@@ -46,8 +46,15 @@ void stopMotor() {// Code for stopping motor}
 }
 
 void moveForward() {// Code for moving forward for some short interval}
-    leftMotor.run(MOTOR_SPEED + speedPID);
-    rightMotor.run(-MOTOR_SPEED + speedPID);
+    speedPID = calculate_PID();
+    leftMotor.run(MOTOR_SPEED - speedPID);
+    rightMotor.run(-MOTOR_SPEED - speedPID);
+
+     Serial.print("PID: "); Serial.print(speedPID);
+    Serial.print(" | L: "); Serial.print(MOTOR_SPEED - speedPID);
+    Serial.print(" | R: "); Serial.print(-MOTOR_SPEED - speedPID);
+    Serial.print(" | Dist: "); Serial.println(find_distance());
+
 }
 
 void helper_turnRight() {// Code for turning right 90 deg}
