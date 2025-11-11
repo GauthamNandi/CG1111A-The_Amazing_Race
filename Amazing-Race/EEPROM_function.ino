@@ -21,10 +21,3 @@ void readBlackWhite(){
   }
   eeAddress+=sizeof(float);
 }
-bool checkExist(){
-  int eeAddress = 0;
-  if(whiteArray[eeAddress]!=0){
-     return true;
-  }
-  return false;
-}
