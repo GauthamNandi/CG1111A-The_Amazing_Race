@@ -1,66 +1,68 @@
 #include "MeOrion.h"
-// #define Debug_Color
+#define Debug_Color
 #define Debug_Movement
+#define IR_RECIEVER_PIN A1
+#define ULTRASONIC_PIN 12
+
+#define RGBWait 400
+#define LDRWait 10
+#define LDR 0
+
 const int S1 = A2;
 const int S2 = A3;
 bool FORWARD = true;
 float speedPID;
-String g_color = "";
+char* colours[] = {"Red","Green","Blue","Orange","Pink"};
+float colourArray[] = { 0, 0, 0 };
+float whiteArray[] = { 0, 0, 0 };
+float blackArray[] = { 0, 0, 0 };
+float greyDiff[] = { 0, 0, 0 };
+
 // MeBuzzer buzzer;
 MeRGBLed led(PORT_3);
 void setup() {
     initialize_PID();
     Serial.begin(9600);
-    #ifdef Debug_Color
     pinMode(S1, OUTPUT);
     pinMode(S2, OUTPUT);
+    pinMode(IR_RECIEVER_PIN, INPUT);
+    pinMode(ULTRASONIC_PIN, OUTPUT);
+    #ifdef Debug_Color
     setBalance();
     #endif 
+    // delay(10000);
 }
 
 void loop() {
-    find_distance();
-    // doubleLeftTurn();
-    // delay(5000);
-    // doubleRightTurn();
-    // turnLeft();
-    // turnRight();
-    // delay(1000);
-    // uTurn();
-
-    // delay(1000);
-    // speedPID = calculate_PID();
-    // moveForward();
-
-    // // #ifdef Debug_Movement
-    // if (FORWARD) {
-    //     speedPID = calculate_PID();
-    //     moveForward();
+    #ifdef Debug_Movement
+    if (FORWARD) {
+        speedPID = calculate_PID();
+        moveForward();
         
-    //     if (detect_black()) {
-    //         stopMotor();
-    //         Serial.println("HERE");
-    //         g_color = (String)color_sensing();
-    //         FORWARD = false;
-    //     } 
-    // } 
-    // else {
-    //     String s = String(g_color);
-    //     turnLedOn(s);
-    //     delay(1000);
-    //     led.setColor(0,0,0);
-    //     led.show();
+        if (detect_black()) {
+            stopMotor();
+            FORWARD = false;
+        } 
+    } 
+    else {
+        delay(100);
+        char* s = color_sensing();
+        Serial.println(s);
+        turnLedOn(s);
+        delay(1000);
+        led.setColor(0,0,0);
+        led.show();
 
-    //     if (s == "Red") turnLeft();
-    //     else if (s == "Green") turnRight();
-    //     else if (s == "Orange") uTurn();
-    //     else if (s == "Pink") doubleLeftTurn();
-    //     else if (s == "Blue") doubleRightTurn();
-    //     else if (s == "White") return;
-    //     moveForward();
-    //     delay(100);
-    //     FORWARD = true;
-    // }
-    // delay(10);
-    // #endif
+        if (strcmp(s,"Red") == 0) turnLeft();
+        else if (strcmp(s,"Green") == 0) turnRight();
+        else if (strcmp(s,"Orange") == 0) uTurn();
+        else if (strcmp(s,"Pink")) doubleLeftTurn();
+        else if (strcmp(s,"Blue")) doubleRightTurn();
+        else if (strcmp(s,"White")) celebrate();
+        moveForward();
+        delay(100);
+        FORWARD = true;
+    }
+    delay(10);
+    #endif
 }
