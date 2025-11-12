@@ -4,6 +4,22 @@ int green = 0;
 int blue = 0;
 int sentivity = 20;
 int LIMIT = 100;
+
+int arr[7][3] = { {300, 347, 249},
+                  {20, 20, 20},
+                  {260, 165, 115},
+                  {278, 215, 130},
+                  {130, 235, 130},
+                  {317, 328, 237},
+                  {69, 241, 200},
+                };
+char* colrrr[7] = {"White", "Black", "Red", "Orange", "Green", "Pink", "Blue"};
+
+float euclidian_distance(float r, float g, float b, float r2, float g2, float b2) {
+  float dr = r - r2, dg = g - g2, db = b - b2;
+  return dr * dr + dg * dg + db * db;
+}
+
 void input(int code) {
   if (code == 0) {
     //TURN RED
@@ -46,10 +62,10 @@ bool detect_black() {
 void turnLedOn(char* s){
   if (strcmp(s,"Red") == 0) led.setColor(255,0,0);
   else if (strcmp(s,"Green")==0) led.setColor(0,255,0);
-  else if (strcmp(s,"Orange")==0) led.setColor(255,255,0);
-  else if (strcmp(s,"Pink")==0) led.setColor(0,255,255);
+  else if (strcmp(s,"Orange")==0) led.setColor(255,165,0);
+  else if (strcmp(s,"Pink")==0) led.setColor(231,84,128);
   else if (strcmp(s,"Blue")==0) led.setColor(0,0,255);
-  else if(strcmp(s,"Yellow") == 0) led.setColor(0,255,255);
+  else if(strcmp(s,"Yellow") == 0) led.setColor(255,255,0);
   else led.setColor(255,255,255);
   led.show();
 }
@@ -67,7 +83,7 @@ void countdown_time(int time) {
   for (int i = time; i >0; --i) {
     Serial.print(i);
     Serial.print(",");
-    delay(500);
+    delay(100);
   }
   Serial.println();
 }
@@ -78,24 +94,16 @@ bool over_limit(float color_val) {
 }
 
 char* classifyColour(float Red, float Green, float Blue){
-  if(!over_limit(Green) && !over_limit(Blue)){
-    return "Red";
+  char* ret = NULL; float min_dist = 1e9;
+  for (int i=0; i<7; i++) {
+    float cur_dist = euclidian_distance(arr[i][0], arr[i][1], arr[i][2], 
+                                      Red, Green, Blue);
+    if (cur_dist < min_dist) {
+      min_dist = cur_dist;
+      ret = colrrr[i];
+    }
   }
-  else if(!over_limit(Red) && over_limit(Blue) && Blue > Green + 1.5*sentivity){
-    return "Blue";
-  }
-  else if(!over_limit(Blue-sentivity) && !over_limit(Red)){
-    return "Green";
-  }
-  else if(!over_limit(Blue-sentivity)){
-    return "Orange";
-  }
-  else if(Green+1.5 * sentivity>255.0 || Blue + 1.5 *  sentivity > 255.0 || Red + 1.5 * sentivity > 255.0){
-    return "White";
-  }
-  else{
-    return "Pink";
-  }
+  return ret;
 }
 
 
