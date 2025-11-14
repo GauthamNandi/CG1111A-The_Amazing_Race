@@ -5,13 +5,13 @@ int blue = 0;
 int sentivity = 20;
 int LIMIT = 100;
 
-int arr[7][3] = { {300, 347, 249},
-                  {20, 20, 20},
-                  {260, 165, 115},
-                  {278, 215, 130},
-                  {130, 235, 130},
-                  {317, 328, 237},
-                  {69, 241, 200},
+int arr[7][3] = { {286, 405, 230},
+                  {0, 0, 0},
+                  {259, 163, 105},
+                  {271, 207, 130},
+                  {115, 212, 105},
+                  {252, 338, 205},
+                  {95, 193, 145},
                 };
 char* colrrr[7] = {"White", "Black", "Red", "Orange", "Green", "Pink", "Blue"};
 
@@ -80,7 +80,7 @@ void print_array(float a[]) {
 }
 
 void countdown_time(int time) {
-  for (int i = time; i >0; --i) {
+  for (int i = time; i > 0; --i) {
     Serial.print(i);
     Serial.print(",");
     delay(100);
@@ -88,16 +88,19 @@ void countdown_time(int time) {
   Serial.println();
 }
 
-#ifdef Debug_Color
 bool over_limit(float color_val) {
   return (color_val > LIMIT);
 }
 
 char* classifyColour(float Red, float Green, float Blue){
   char* ret = NULL; float min_dist = 1e9;
+  if (max(Red, max(Green, Blue)) > 380) return "White";
+
+
   for (int i=0; i<7; i++) {
     float cur_dist = euclidian_distance(arr[i][0], arr[i][1], arr[i][2], 
                                       Red, Green, Blue);
+
     if (cur_dist < min_dist) {
       min_dist = cur_dist;
       ret = colrrr[i];
@@ -149,6 +152,7 @@ void setBalance() {
   turnLedOn("White");
   Serial.println("Put Black Sample For Calibration ...");
   turnLedOn("White");
+  delay(3000);
   countdown_time(5);
   led.setColor(0,0,0);
   led.show();
@@ -163,4 +167,3 @@ void setBalance() {
   Serial.println("Black Array:");
   print_array(blackArray);
 }
-#endif
