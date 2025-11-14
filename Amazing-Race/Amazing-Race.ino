@@ -1,6 +1,6 @@
 #include "MeOrion.h"
-#define Debug_Color
-// #define Debug_Movement
+// #define Debug_Color
+#define Debug_Movement
 #define IR_RECIEVER_PIN A1
 #define ULTRASONIC_PIN 12
 
@@ -14,12 +14,13 @@ bool FORWARD = true;
 float speedPID;
 char* colours[] = {"Red","Green","Blue","Orange","Pink"};
 float colourArray[] = { 0, 0, 0 };
-float whiteArray[] = { 462.0, 378.0, 461.0 };
-float blackArray[] = { 30.0, 27.0, 43.0 };
+float whiteArray[] = { 593.0, 578.0, 474.0 };
+float blackArray[] = { 128.0, 127.0, 109.0 };
 float greyDiff[] = { 432.0, 351.0, 418.0 };
 
 // MeBuzzer buzzer;
 MeRGBLed led(PORT_3);
+unsigned long last;
 void setup() {
     initialize_PID();
     Serial.begin(9600);
@@ -27,15 +28,20 @@ void setup() {
     pinMode(S2, OUTPUT);
     pinMode(IR_RECIEVER_PIN, INPUT);
     pinMode(ULTRASONIC_PIN, OUTPUT);
+    last = millis();
     // #ifdef Debug_Color
     // setBalance();
     // #endif 
     // delay(10000);
 }
 
+int cntr = 0;
+
 void loop() {
+    #ifdef Debug_Color
     char* s = color_sensing();
     Serial.println(s);
+    #endif
     // turnLedOn(s);
     // delay(1000);
     // led.setColor(0,0,0);
@@ -53,14 +59,24 @@ void loop() {
         // speedPID = calculate_PID();
         moveForward();
         
-        if (detect_black()) {
+        unsigned long now = millis();
+        if (now - last > 500 && detect_black()) {
+            last = now;
             stopMotor();
             FORWARD = false;
         } 
     } 
     else {
-        delay(100);
+        // char* s = color_sensing();
+        cntr++;
         char* s = color_sensing();
+        if (cntr >= 8 && (strcmp(s, "Pink") == 0 || strcmp(s, "White") == 0)) {
+            turnLedOn("White");
+            led.setColor(0,0,0);
+            led.show();
+            celebrate();
+        }
+        delay(300);
         Serial.println(s);
         turnLedOn(s);
         delay(100);
