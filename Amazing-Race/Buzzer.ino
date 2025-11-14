@@ -166,4 +166,6 @@ void celebrate()
   buzzer.tone(NOTE_B3, 500);
 
   buzzer.noTone();
+  delay(10000);
+  // exit();
 }
