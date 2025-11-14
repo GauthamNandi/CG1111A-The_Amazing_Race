@@ -1,6 +1,6 @@
-#define TURN_TIME 600
+#define TURN_TIME 500
 #define TURNING_SPEED 160
-#define MOTOR_SPEED 200
+#define MOTOR_SPEED 225
 #define STRAIGHT_TIME 1000
 
 double kp, ki, kd;
@@ -11,7 +11,7 @@ MeDCMotor leftMotor(M1);
 MeDCMotor rightMotor(M2);
 
 void initialize_PID() {
-    kp = 20.0;
+    kp = 18.0;
     ki = 0.0;
     kd = 0.0; 
     lsttime = millis();
@@ -22,7 +22,7 @@ double calculate_PID() {
     double dt = (now - lsttime) / 1000.0;
     if (dt <= 0) dt = 0.001;
 
-    long setpoint = 9;
+    double setpoint = 8.0;
     double distance = find_distance();
     double error = setpoint - distance;
 
@@ -50,7 +50,7 @@ bool irwawy = false;
 void moveForward() {// Code for moving forward for some short interval}
     speedPID = -calculate_PID();
     if (irwawy) {
-        speedPID = +130;
+        speedPID = +140;
         irwawy = !irwawy;
     }
 
@@ -87,8 +87,8 @@ void turnLeft() {
 }
 
 void uTurn() {// Code for u-turn}
-    helper_turnLeft();
-    delay(1.8 * TURN_TIME);
+    helper_turnRight();
+    delay(2 * TURN_TIME);
     stopMotor();
 }
 
@@ -96,7 +96,7 @@ void doubleLeftTurn() {// Code for double left turn}
     turnLeft();
     
     moveForward();
-    delay(STRAIGHT_TIME);
+    delay(1100);
     stopMotor();
 
     turnLeft();
@@ -106,7 +106,7 @@ void doubleRightTurn() {// Code for double right turn}
     turnRight();
     
     moveForward();
-    delay(STRAIGHT_TIME);
+    delay(850);
     stopMotor();
 
     turnRight();
