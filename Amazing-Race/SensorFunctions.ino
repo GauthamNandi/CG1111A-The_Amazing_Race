@@ -45,9 +45,10 @@ double ir_distance() {
 
 long find_distance() {
     long u_dist = ultrasonic_distance();
+    Serial.println(read_ir());
     if (u_dist == 0 || u_dist > 20) {
-        if (read_ir()>1.3) irwawy = true;
-        return 9.0;
+        if (read_ir()>1.67) irwawy = true;
+        return 8.03;
     }
     return u_dist;
 }
