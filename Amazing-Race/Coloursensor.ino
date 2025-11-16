@@ -1,25 +1,35 @@
+/*
+===================================================================
+Colour Sensor
+===================================================================
+*/
+
+// --- Initalisation ---
 MeLineFollower lineFinder(PORT_2);
-int red = 0;
-int green = 0;
-int blue = 0;
-int sentivity = 20;
-int LIMIT = 100;
+MeRGBLed led(PORT_3);
 
-int arr[7][3] = { {286, 405, 230},
-                  {0, 0, 0},
-                  {259, 163, 105},
-                  {271, 207, 130},
-                  {115, 212, 105},
-                  {252, 338, 205},
-                  {95, 193, 145},
-                };
-char* colrrr[7] = {"White", "Black", "Red", "Orange", "Green", "Pink", "Blue"};
+// --- Constants ---
+#define RGBWait 200
+#define LDRWait 10
+#define LDR 0
 
-float euclidian_distance(float r, float g, float b, float r2, float g2, float b2) {
-  float dr = r - r2, dg = g - g2, db = b - b2;
-  return dr * dr + dg * dg + db * db;
-}
+// --- Global Variables ---
+const int S1 = A2;
+const int S2 = A3;
+float whiteArray[] = { 593.0, 578.0, 474.0 };
+float blackArray[] = { 128.0, 127.0, 109.0 };
+float greyDiff[] = { 432.0, 351.0, 418.0 };
+char* possible_colours[7] = {"White", "Black", "Red", "Orange", "Green", "Pink", "Blue"};
+int colour_values[7][3] = { {286, 405, 230},
+                            {0, 0, 0},
+                            {259, 163, 105},
+                            {271, 207, 130},
+                            {115, 212, 105},
+                            {252, 338, 205},
+                            {95, 193, 145},
+                          };
 
+// Turns on LEDs or IR Sensor 
 void input(int code) {
   if (code == 0) {
     //TURN RED
@@ -41,6 +51,48 @@ void input(int code) {
   }
 }
 
+// Detect Black
+bool detect_black() {
+  int sensorState = lineFinder.readSensors();
+  return (sensorState == S1_IN_S2_IN);
+}
+
+// Turn LED on based on Colour
+void turnLedOn(char* s){
+  if (strcmp(s,"Red") == 0) led.setColor(255,0,0);
+  else if (strcmp(s,"Green")==0) led.setColor(0,255,0);
+  else if (strcmp(s,"Orange")==0) led.setColor(255,165,0);
+  else if (strcmp(s,"Pink")==0) led.setColor(231,84,128);
+  else if (strcmp(s,"Blue")==0) led.setColor(0,0,255);
+  else if(strcmp(s,"Yellow") == 0) led.setColor(255,255,0);
+  else led.setColor(255,255,255);
+  led.show();
+}
+
+// Return euclidian_distance between RGB colours
+float euclidian_distance(float r, float g, float b, float r2, float g2, float b2) {
+  float dr = r - r2, dg = g - g2, db = b - b2;
+  return dr * dr + dg * dg + db * db;
+}
+
+// Return the colour closest based on the Euclidian Distance
+char* classifyColour(float Red, float Green, float Blue){
+  char* return_colour; 
+  float min_dist = 1e9;
+
+  for (int i=0; i<7; i++) {
+    float cur_dist = euclidian_distance(colour_values[i][0], colour_values[i][1], colour_values[i][2], 
+                                        Red, Green, Blue);
+
+    if (cur_dist < min_dist) {
+      min_dist = cur_dist;
+      return_colour = possible_colours[i];
+    }
+  }
+  return return_colour;
+}
+
+// Get Average of Readings
 int getAvgReading(int times) {
   int reading;
   int total = 0;
@@ -54,22 +106,31 @@ int getAvgReading(int times) {
   return total / times;
 }
 
-bool detect_black() {
-  int sensorState = lineFinder.readSensors();
-  return (sensorState == S1_IN_S2_IN);
+// Returns the detected colour
+char* color_sensing() {
+  float colourArray[] = {0, 0, 0};
+  for (int c = 0; c <= 2; c++) {
+    input(c);
+    delay(RGBWait);
+    colourArray[c] = getAvgReading(5);
+    colourArray[c] = (colourArray[c] - blackArray[c]) / (greyDiff[c]) * 255.0;
+    input(3); 
+
+    delay(RGBWait);
+    #ifdef Debug_color
+    Serial.print(int(colourArray[c]));
+    Serial.print(",");
+    #endif
+  }
+  char *colour = classifyColour(colourArray[0],colourArray[1],colourArray[2]);
+  #ifdef Debug_color
+  Serial.print(colour);
+  Serial.println("");
+  #endif
+  return colour;
 }
 
-void turnLedOn(char* s){
-  if (strcmp(s,"Red") == 0) led.setColor(255,0,0);
-  else if (strcmp(s,"Green")==0) led.setColor(0,255,0);
-  else if (strcmp(s,"Orange")==0) led.setColor(255,165,0);
-  else if (strcmp(s,"Pink")==0) led.setColor(231,84,128);
-  else if (strcmp(s,"Blue")==0) led.setColor(0,0,255);
-  else if(strcmp(s,"Yellow") == 0) led.setColor(255,255,0);
-  else led.setColor(255,255,255);
-  led.show();
-}
-
+#ifdef Debug_color
 void print_array(float a[]) {
   for (int i = 0; i < 3; ++i) {
     Serial.print(a[i]);
@@ -88,58 +149,8 @@ void countdown_time(int time) {
   Serial.println();
 }
 
-bool over_limit(float color_val) {
-  return (color_val > LIMIT);
-}
-
-char* classifyColour(float Red, float Green, float Blue){
-  char* ret = NULL; float min_dist = 1e9;
-  if (max(Red, max(Green, Blue)) > 380) return "White";
-
-
-  for (int i=0; i<7; i++) {
-    float cur_dist = euclidian_distance(arr[i][0], arr[i][1], arr[i][2], 
-                                      Red, Green, Blue);
-
-    if (cur_dist < min_dist) {
-      min_dist = cur_dist;
-      ret = colrrr[i];
-    }
-  }
-  return ret;
-}
-
-
-char* color_sensing() {
-  turnLedOn("White");
-  countdown_time(3);
-  led.setColor(0,0,0);
-  led.show();
-  for (int c = 0; c <= 2; c++) {
-    input(c);
-    delay(RGBWait);
-    colourArray[c] = getAvgReading(5);
-    colourArray[c] = (colourArray[c] - blackArray[c]) / (greyDiff[c]) * 255.0;
-    input(3); 
-    delay(RGBWait);
-    Serial.print(int(colourArray[c]));
-    Serial.print(",");
-    delay(LDRWait);
-  }
-  char *colour = classifyColour(colourArray[0],colourArray[1],colourArray[2]);
-  Serial.print(colour);
-  Serial.println("");
-  return colour;
-}
-
-
 void setBalance() {
-  //set white balance
   Serial.println("Put White Sample For Calibration ...");
-  // turnLedOn("White");
-  // countdown_time(5);
-  // led.setColor(0,0,0);
-  // led.show();
   for (int i = 0; i <= 2; i++) {
     input(i);
     delay(RGBWait);
@@ -167,3 +178,4 @@ void setBalance() {
   Serial.println("Black Array:");
   print_array(blackArray);
 }
+#endif
