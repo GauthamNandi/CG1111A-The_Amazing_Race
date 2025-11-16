@@ -1,113 +1,114 @@
+/*
+===================================================================
+mBot Robot Movement Control
+===================================================================
+*/
+
+// --- Initalisation ---
+MeDCMotor leftMotor(M1);
+MeDCMotor rightMotor(M2);
+
+// --- Constants ---
 #define TURN_TIME 500
 #define TURNING_SPEED 160
 #define MOTOR_SPEED 225
 #define STRAIGHT_TIME 1000
+#define DOUBLE_LEFT_STRAIGHT_TIME 1100
+#define DOUBLE_RIGHT_STRAIGHT_TIME 850
 
-double kp, ki, kd;
-double errsum, lasterr;
-unsigned long lsttime;
+// --- Global Variables --- 
+bool use_ir_sensor = false;
 
-MeDCMotor leftMotor(M1);
-MeDCMotor rightMotor(M2);
-
-void initialize_PID() {
-    kp = 18.0;
-    ki = 0.0;
-    kd = 0.0; 
-    lsttime = millis();
-}
-
+// Calculate (P)ID
 double calculate_PID() {
-    unsigned long now = millis();
-    double dt = (now - lsttime) / 1000.0;
-    if (dt <= 0) dt = 0.001;
-
+    double kp = 18.0
     double setpoint = 8.0;
     double distance = find_distance();
     double error = setpoint - distance;
 
-    errsum += error * dt;
-    double dErr = (error - lasterr) / dt;
-    double pid = kp * error + ki * errsum + kd * dErr;
+    double pid = kp * error;
 
     if (pid > 255) pid = 255;
     if (pid < -255) pid = -255;
 
-    lasterr = error;
-    lsttime = now;
-
-    // return 0;
     return pid;
 }
 
-void stopMotor() {// Code for stopping motor}
+// Move Forward with PID correction
+void moveForward() {
+    speed_PID = -calculate_PID();
+    if (use_ir_sensor) { // Uses the IR sensor, hence speed_PID should be negative
+        speed_PID = -speed_PID; 
+        use_ir_sensor = false;
+    }
+    leftMotor.run(MOTOR_SPEED + speed_PID);
+    rightMotor.run(-MOTOR_SPEED + speed_PID);
+
+    #ifdef Debug_Movement
+    Serial.print("PID: "); Serial.print(speedPID);
+    Serial.print(" | L: "); Serial.print(MOTOR_SPEED - speedPID);
+    Serial.print(" | R: "); Serial.print(-MOTOR_SPEED - speedPID);
+    Serial.print(" | Dist: "); Serial.println(find_distance());
+    #endif
+}
+
+// Stops Motors
+void stopMotor() { 
     leftMotor.stop();
     rightMotor.stop();
 }
 
-bool irwawy = false;
-
-void moveForward() {// Code for moving forward for some short interval}
-    speedPID = -calculate_PID();
-    if (irwawy) {
-        speedPID = +140;
-        irwawy = !irwawy;
-    }
-
-    leftMotor.run(MOTOR_SPEED + speedPID);
-    rightMotor.run(-MOTOR_SPEED + speedPID);
-
-     Serial.print("PID: "); Serial.print(speedPID);
-    Serial.print(" | L: "); Serial.print(MOTOR_SPEED - speedPID);
-    Serial.print(" | R: "); Serial.print(-MOTOR_SPEED - speedPID);
-    Serial.print(" | Dist: "); Serial.println(find_distance());
-
-}
-
-void helper_turnRight() {// Code for turning right 90 deg}
+// Sets motors to spin RIGHT
+void helper_turnRight() { 
     leftMotor.run(-TURNING_SPEED);
     rightMotor.run(-TURNING_SPEED);
 }
 
-void helper_turnLeft() {// Code for turning right 90 deg}
+// Sets motors to spin LEFT
+void helper_turnLeft() { 
     leftMotor.run(TURNING_SPEED);
     rightMotor.run(TURNING_SPEED);
 }
 
+// Executes a 90-degree RIGHT turn
 void turnRight() {
     helper_turnRight();
     delay(TURN_TIME);
     stopMotor();
 }
 
+// Executes a 90-degree LEFT turn
 void turnLeft() {
     helper_turnLeft();
     delay(TURN_TIME);
     stopMotor(); 
 }
 
-void uTurn() {// Code for u-turn}
+// Executes a 180-degree RIGHT turn
+void uTurn() {
     helper_turnRight();
     delay(2 * TURN_TIME);
     stopMotor();
 }
 
-void doubleLeftTurn() {// Code for double left turn}
-    turnLeft();
-    
+// Executes a double RIGHT turn
+void doubleRightTurn() {
+    turnRight();
+
     moveForward();
-    delay(1100);
+    delay(DOUBLE_RIGHT_STRAIGHT_TIME);
     stopMotor();
 
-    turnLeft();
+    turnRight();
 }
 
-void doubleRightTurn() {// Code for double right turn}
-    turnRight();
+// Executes a double LEFT turn
+void doubleLeftTurn() {
+    turnLeft();
     
     moveForward();
-    delay(850);
+    delay(DOUBLE_LEFT_STRAIGHT_TIME);
     stopMotor();
 
-    turnRight();
+    turnLeft();
 }
