@@ -98,8 +98,7 @@ MeBuzzer buzzer;
 #define NOTE_DS8 4978
 #define REST      0
 
-// Rickroll: "Never Gonna Give You Up" (approximation)
-// Paste this inside your existing celebrate() function (replace the body)
+
 void celebrate()
 {
   // Intro / verse motif
@@ -128,22 +127,21 @@ void celebrate()
   buzzer.tone(NOTE_A4, 400);
   buzzer.tone(REST, 150);
 
-  // Chorus: "Never gonna give you up..."
-  buzzer.tone(NOTE_E4, 400);      // "Never"
+  buzzer.tone(NOTE_E4, 400);      
   buzzer.tone(NOTE_B3, 200);
   buzzer.tone(NOTE_CS4, 200);
 
   buzzer.tone(NOTE_B3, 200);
-  buzzer.tone(NOTE_E4, 400);      // "gonna"
+  buzzer.tone(NOTE_E4, 400);      
   buzzer.tone(NOTE_B3, 200);
   buzzer.tone(NOTE_CS4, 200);
 
   buzzer.tone(NOTE_B3, 200);
-  buzzer.tone(NOTE_A3, 400);      // "give you"
+  buzzer.tone(NOTE_A3, 400);      
   buzzer.tone(NOTE_E4, 200);
   buzzer.tone(NOTE_FS4, 200);
 
-  buzzer.tone(NOTE_GS4, 600);     // "up" (held)
+  buzzer.tone(NOTE_GS4, 600);  
   buzzer.tone(REST, 200);
 
   // Short riff
