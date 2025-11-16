@@ -1,6 +1,18 @@
+/*
+===================================================================
+Sensor Measeurements & Calculations
+===================================================================
+*/
+
+// --- Initalisation ---
+#define IR_RECIEVER_PIN A1
+#define ULTRASONIC_PIN 12
+
+// --- Constants ---
 #define TIMEOUT 5000     
 #define SPEED_OF_SOUND 340 
 
+// Returns the Measured Ultrasonic distance
 float ultrasonic_distance() {
     digitalWrite(ULTRASONIC_PIN, LOW);
     delayMicroseconds(2);
@@ -13,42 +25,29 @@ float ultrasonic_distance() {
     long duration = pulseIn(ULTRASONIC_PIN, HIGH, TIMEOUT);
     return duration / 2.0 / 1000000 * SPEED_OF_SOUND * 100;  // distance in cm
 }
-float read_ir(){
+
+// Returns the Measured IR sensor distance
+float read_ir_distance() {
     input(0);
     float val_before = analogRead(IR_RECIEVER_PIN);
     delayMicroseconds(100);
     input(3);
     float val_after = analogRead(IR_RECIEVER_PIN); 
     delayMicroseconds(100);
-    return (val_after - val_before) * 5.0 / 1023.0;
-}
 
-double ir_distance() {
-    double total = 0.0;
-    for (int i = 0; i < 10; i++) {
-        total+=(double)read_ir();
-    }
-    input(0);
-    total= (double)total / 10.0;
-    // 4) Distance model derived from your calibration
-    // distance ≈ 270 * adc^-1.1   (cm)
-    float distance = 270.0 * pow(total, -1.1);
-
-    // 5) Clamp range (avoid crazy readings)
-    if (distance < 1) distance = 1;
-    if (distance > 20) distance = 20;
-
-    Serial.println(distance);
+    float voltage = (val_after - val_before) * 5.0 / 1023.0;
+    float distance = 20.495 * pow(voltage, -1.1904);
+    
     return distance;
-    // return pow(total/321.8,-2.469);
 }
 
+// Returns Needed Distance
 long find_distance() {
-    long u_dist = ultrasonic_distance();
-    Serial.println(read_ir());
-    if (u_dist == 0 || u_dist > 20) {
-        if (read_ir()>1.67) irwawy = true;
-        return 8.03;
+    long ultrasonic_dist = ultrasonic_distance();
+    
+    if (ultrasonic_dist == 0 || ultrasonic_dist > 20) {
+        use_ir_sensor = true;
+        return read_ir_distance();
     }
-    return u_dist;
+    return ultrasonic_dist;
 }
